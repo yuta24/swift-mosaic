@@ -194,9 +194,7 @@ enum Modifier: Decodable {
     case foregroundColor(Color)
 }
 
-enum Content: View, Decodable {
-    static var handler: (String) -> Void = { _ in }
-
+enum Content: Decodable {
     // MARK: Text
 
     case text(text: Text)
@@ -217,7 +215,7 @@ enum Content: View, Decodable {
 
     indirect case navigation(title: String, contents: [Content])
 
-    var body: some View {
+    func toView(with controller: Controller) -> some View {
         switch self {
         case .text(let text):
             return SwiftUI.Text(text.content)
@@ -225,33 +223,32 @@ enum Content: View, Decodable {
                 .eraseToAnyView()
         case .button(let button):
             return SwiftUI.Button(
-                action: { if let action = button.action { Content.handler(action) } },
-                label: { button.label }
-            )
+                action: { if let action = button.action { controller.dispatch(action) } },
+                label: { button.label.toView(with: controller) })
             .eraseToAnyView()
         case .horizontal(let alignment, let spacing, let contents):
             return HStack(
                 alignment: alignment.value,
                 spacing: spacing,
-                content: { contents.views }
+                content: { contents.toView(with: controller) }
             )
             .eraseToAnyView()
         case .vertical(let alignment, let spacing, let contents):
             return VStack(
                 alignment: alignment.value,
                 spacing: spacing,
-                content: { contents.views }
+                content: { contents.toView(with: controller) }
             )
             .eraseToAnyView()
         case .zaxis(let alignment, let contents):
             return ZStack(
                 alignment: alignment.value,
-                content: { contents.views }
+                content: { contents.toView(with: controller) }
             )
             .eraseToAnyView()
         case .navigation(let title, let contents):
             return NavigationView(content: {
-                contents.views
+                contents.toView(with: controller)
                     .navigationTitle(title)
             })
             .eraseToAnyView()

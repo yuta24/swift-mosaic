@@ -8,37 +8,37 @@ extension View {
 }
 
 extension Array where Element == Content {
-    var views: AnyView {
+    func toView(with controller: Controller) -> some View {
         switch count {
         case 0:
             return EmptyView()
                 .eraseToAnyView()
         case 1:
-            return ViewBuilder.buildBlock(self[0])
+            return ViewBuilder.buildBlock(self[0].toView(with: controller))
                 .eraseToAnyView()
         case 2:
-            return ViewBuilder.buildBlock(self[0], self[1])
+            return ViewBuilder.buildBlock(self[0].toView(with: controller), self[1].toView(with: controller))
                 .eraseToAnyView()
         case 3:
-            return ViewBuilder.buildBlock(self[0], self[1], self[2])
+            return ViewBuilder.buildBlock(self[0].toView(with: controller), self[1].toView(with: controller), self[2].toView(with: controller))
                 .eraseToAnyView()
         case 4:
-            return ViewBuilder.buildBlock(self[0], self[1], self[2], self[3])
+            return ViewBuilder.buildBlock(self[0].toView(with: controller), self[1].toView(with: controller), self[2].toView(with: controller), self[3].toView(with: controller))
                 .eraseToAnyView()
         case 5:
-            return ViewBuilder.buildBlock(self[0], self[1], self[2], self[3], self[4])
+            return ViewBuilder.buildBlock(self[0].toView(with: controller), self[1].toView(with: controller), self[2].toView(with: controller), self[3].toView(with: controller), self[4].toView(with: controller))
                 .eraseToAnyView()
         case 6:
-            return ViewBuilder.buildBlock(self[0], self[1], self[2], self[3], self[4], self[5])
+            return ViewBuilder.buildBlock(self[0].toView(with: controller), self[1].toView(with: controller), self[2].toView(with: controller), self[3].toView(with: controller), self[4].toView(with: controller), self[5].toView(with: controller))
                 .eraseToAnyView()
         case 7:
-            return ViewBuilder.buildBlock(self[0], self[1], self[2], self[3], self[4], self[5], self[6])
+            return ViewBuilder.buildBlock(self[0].toView(with: controller), self[1].toView(with: controller), self[2].toView(with: controller), self[3].toView(with: controller), self[4].toView(with: controller), self[5].toView(with: controller), self[6].toView(with: controller))
                 .eraseToAnyView()
         case 8:
-            return ViewBuilder.buildBlock(self[0], self[1], self[2], self[3], self[4], self[5], self[6], self[7])
+            return ViewBuilder.buildBlock(self[0].toView(with: controller), self[1].toView(with: controller), self[2].toView(with: controller), self[3].toView(with: controller), self[4].toView(with: controller), self[5].toView(with: controller), self[6].toView(with: controller), self[7].toView(with: controller))
                 .eraseToAnyView()
         case 9:
-            return ViewBuilder.buildBlock(self[0], self[1], self[2], self[3], self[4], self[5], self[6], self[7], self[8])
+            return ViewBuilder.buildBlock(self[0].toView(with: controller), self[1].toView(with: controller), self[2].toView(with: controller), self[3].toView(with: controller), self[4].toView(with: controller), self[5].toView(with: controller), self[6].toView(with: controller), self[7].toView(with: controller), self[8].toView(with: controller))
                 .eraseToAnyView()
         default:
             return EmptyView()
