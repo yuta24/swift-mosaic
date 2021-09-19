@@ -179,14 +179,90 @@ enum Alignment: Decodable {
     }
 }
 
+enum ToolbarItemPlacement: String, Decodable {
+    case automatic
+    case principal
+    case navigation
+    case primaryAction
+    case status
+    case confirmationAction
+    case cancellationAction
+    case destructiveAction
+    case keyboard
+    case navigationBarLeading
+    case navigationBarTrailing
+    case bottomBar
+
+    var value: SwiftUI.ToolbarItemPlacement {
+        switch self {
+        case .automatic:
+            return .automatic
+        case .principal:
+            return .principal
+        case .navigation:
+            return .navigation
+        case .primaryAction:
+            return .primaryAction
+        case .status:
+            return .status
+        case .confirmationAction:
+            return .confirmationAction
+        case .cancellationAction:
+            return .cancellationAction
+        case .destructiveAction:
+            return .destructiveAction
+        case .keyboard:
+            return .keyboard
+        case .navigationBarLeading:
+            return .navigationBarLeading
+        case .navigationBarTrailing:
+            return .navigationBarTrailing
+        case .bottomBar:
+            return .bottomBar
+        }
+    }
+}
+
 struct Text: Decodable {
     let content: String
     let font: Font?
 }
 
+struct Image: Decodable {
+    let systemName: String
+}
+
+struct AsyncImage: Decodable {
+    let url: URL
+}
+
+enum Action: Decodable {
+    case local(String)
+    case remote
+}
+
 struct Button: Decodable {
     let label: Content
-    let action: String?
+    let action: Action?
+}
+
+struct SheetButton: Decodable {
+    let label: Content
+    let action: String
+}
+
+struct ToolbarItem: Decodable {
+    let content: Content
+}
+
+struct Toolbar: Decodable {
+    let leading: ToolbarItem?
+    let trailing: ToolbarItem?
+}
+
+struct NavigationLink: Decodable {
+    let destination: Content
+    let label: Content
 }
 
 enum Modifier: Decodable {
@@ -201,25 +277,43 @@ enum Content: Decodable {
 
     // MARK: Images
 
+    case image(image: Image)
+    case asyncImage(image: AsyncImage)
+
     // MARK: Buttons
 
     indirect case button(button: Button)
 
-    // MARK: Layout
+    // MARK: Stacks
 
     indirect case horizontal(alignment: VerticalAlignment, spacing: CGFloat?, contents: [Content])
     indirect case vertical(alignment: HorizontalAlignment, spacing: CGFloat?, contents: [Content])
     indirect case zaxis(alignment: Alignment, content: [Content])
 
+    // MARK: Lists
+
+    indirect case list(contents: [Content])
+
     // MARK: Hierarchical Views
 
-    indirect case navigation(title: String, contents: [Content])
+    indirect case navigation(title: String?, toolbar: Toolbar?, contents: [Content])
+    indirect case navigationLink(link: NavigationLink)
+
+    // MARK: Custom
+
+    indirect case sheetButton(sheetButton: SheetButton)
 
     func toView(with controller: Controller) -> some View {
         switch self {
         case .text(let text):
             return SwiftUI.Text(text.content)
                 .font(text.font?.value)
+                .eraseToAnyView()
+        case .image(let image):
+            return SwiftUI.Image(systemName: image.systemName)
+                .eraseToAnyView()
+        case .asyncImage(let image):
+            return SwiftUI.AsyncImage(url: image.url)
                 .eraseToAnyView()
         case .button(let button):
             return SwiftUI.Button(
@@ -246,11 +340,50 @@ enum Content: Decodable {
                 content: { contents.toView(with: controller) }
             )
             .eraseToAnyView()
-        case .navigation(let title, let contents):
-            return NavigationView(content: {
+        case .list(let contents):
+            return List {
                 contents.toView(with: controller)
-                    .navigationTitle(title)
-            })
+            }
+            .eraseToAnyView()
+        case .navigation(let title, let toolbar, let contents):
+            var target = contents.toView(with: controller).eraseToAnyView()
+            if let title = title {
+                target = target.navigationTitle(title).eraseToAnyView()
+            }
+            if let toolbar = toolbar {
+                if let item = toolbar.leading {
+                    target = target.toolbar {
+                        SwiftUI.ToolbarItem(placement: .navigationBarLeading) {
+                            item.content.toView(with: controller)
+                        }
+                    }
+                    .eraseToAnyView()
+                }
+                if let item = toolbar.trailing {
+                    target = target.toolbar {
+                        SwiftUI.ToolbarItem(placement: .navigationBarTrailing) {
+                            item.content.toView(with: controller)
+                        }
+                    }
+                    .eraseToAnyView()
+                }
+            }
+
+            return NavigationView {
+                target
+            }
+            .eraseToAnyView()
+        case .navigationLink(let link):
+            return SwiftUI.NavigationLink(
+                destination: { LazyView(link.destination.toView(with: controller)) },
+                label: { link.label.toView(with: controller) }
+            )
+            .eraseToAnyView()
+        case .sheetButton(let sheetButton):
+            return SwiftUI.Button(
+                action: { controller.transit(sheetButton.action) },
+                label: { sheetButton.label.toView(with: controller) }
+            )
             .eraseToAnyView()
         }
     }

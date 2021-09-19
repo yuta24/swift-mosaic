@@ -1,10 +1,32 @@
 import Foundation
 import SwiftUI
 
-public enum Source {
-    case json(String, [String: Any], (String, inout [String: Any]) -> Void)
-    case file(URL, [String: Any], (String, inout [String: Any]) -> Void)
+public protocol Sourceable {
+    func toString() -> String
 }
+
+extension Int: Sourceable {
+    public func toString() -> String {
+        return "\(self)"
+    }
+}
+
+extension String: Sourceable {
+    public func toString() -> String {
+        return self
+    }
+}
+
+public enum Provider {
+    case json(String, [String: Sourceable], (String, inout [String: Sourceable]) -> Void)
+    case file(URL, [String: Sourceable], (String, inout [String: Sourceable]) -> Void)
+}
+
+private let decoder: JSONDecoder = {
+    let decoder = JSONDecoder()
+    decoder.keyDecodingStrategy = .convertFromSnakeCase
+    return decoder
+}()
 
 public struct MosaicView: View {
     @StateObject
@@ -14,8 +36,7 @@ public struct MosaicView: View {
         do {
             let json = try controller.body()
             if let data = json.data(using: .utf8) {
-                return try JSONDecoder()
-                    .decode(Content.self, from: data)
+                return try decoder.decode(Screen.self, from: data)
                     .toView(with: controller)
                     .eraseToAnyView()
             } else {
@@ -23,12 +44,13 @@ public struct MosaicView: View {
                     .eraseToAnyView()
             }
         } catch {
-            return EmptyView()
+            print(error.localizedDescription)
+            return SwiftUI.Text("The JSON parsing failed.")
                 .eraseToAnyView()
         }
     }
 
-    public init(_ source: Source) {
-        self._controller = .init(wrappedValue: .init(source))
+    public init(_ provider: Provider) {
+        self._controller = .init(wrappedValue: .init(provider))
     }
 }
