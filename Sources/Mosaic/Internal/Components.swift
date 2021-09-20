@@ -87,6 +87,7 @@ struct NavigationLink: Decodable {
 enum Component: Decodable {
     case text(title: String, modifiers: [Modifier]?)
     case image(systemName: String, resizable: Bool, modifiers: [Modifier]?)
+    case asyncImage(url: URL, resizable: Bool, modifiers: [Modifier]?)
 
     indirect case button(label: Component, action: ButtonAction?, modifiers: [Modifier]?)
     indirect case sheetButton(label: Component, id: WidgetID, modifiers: [Modifier]?)

@@ -243,6 +243,17 @@ func make(_ component: Component, with controller: Controller) -> some View {
             return SwiftUI.Image(systemName: systemName)
                 .eraseToAnyView()
         }
+    case .asyncImage(let url, let resizable, let modifiers):
+        let modifiers = modifiers ?? []
+        return SwiftUI.AsyncImage(url: url) { image in
+            if resizable {
+                image.resizable()
+            }
+        } placeholder: {
+            ProgressView()
+        }
+        .modifier(CustomModifiers(modifiers))
+        .eraseToAnyView()
     case .button(let label, let action, let modifiers):
         let modifiers = modifiers ?? []
         return SwiftUI.Button(
