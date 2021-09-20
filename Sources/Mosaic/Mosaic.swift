@@ -38,13 +38,24 @@ public struct MosaicView: View {
             if let data = json.data(using: .utf8) {
                 let screen = try decoder.decode(Screen.self, from: data)
                 return make(screen, with: controller)
+                    .sheet(
+                        item: .init(
+                            get: { controller.screenID },
+                            set: { controller.screenID = $0 }),
+                        content: {
+                            screen.sheet?.components[$0.rawValue]
+                                .flatMap { make($0, with: controller) }?
+                                .eraseToAnyView()
+                            ?? EmptyView().eraseToAnyView()
+                        }
+                    )
                     .eraseToAnyView()
             } else {
                 return EmptyView()
                     .eraseToAnyView()
             }
         } catch {
-            print(error.localizedDescription)
+            print(error)
             return SwiftUI.Text("The JSON parsing failed.")
                 .eraseToAnyView()
         }

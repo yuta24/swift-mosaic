@@ -1,10 +1,10 @@
 import Foundation
 
 class Controller: ObservableObject {
-    var transitor: (String) -> Void = { _ in }
-
     @Published
     private(set) var provider: Provider
+    @Published
+    var screenID: ScreenID?
 
     init(_ provider: Provider) {
         self.provider = provider
@@ -33,10 +33,6 @@ class Controller: ObservableObject {
         case .remote:
             dispatchForRemote()
         }
-    }
-
-    func transit(_ action: String) {
-        transitor(action)
     }
 
     private func dispatchForLocal(_ command: String) {

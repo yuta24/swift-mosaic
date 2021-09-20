@@ -5,6 +5,10 @@ struct ScreenID: RawRepresentable {
     let rawValue: String
 }
 
+extension ScreenID: Identifiable {
+    var id: ScreenID { self }
+}
+
 extension ScreenID: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(rawValue)
@@ -18,29 +22,8 @@ extension ScreenID: Decodable {
     }
 }
 
-class ScreenViewModel: ObservableObject {
-    @Published
-    var id: ScreenID?
-}
-
-struct ScreenView<Content: View>: View {
-    let content: Content
-    let controller: Controller
-    let build: (ScreenID) -> AnyView
-
-    @StateObject
-    var viewModel: ScreenViewModel
-
-    var body: some View {
-        content
-//            .sheet(
-//            item: .init(get: { viewModel.id }, set: { viewModel.id = $0 }),
-//            content: build)
-    }
-}
-
 struct Sheet: Decodable {
-    let components: [ScreenID: Component]
+    let components: [String: Component]
 }
 
 struct Screen: Decodable {

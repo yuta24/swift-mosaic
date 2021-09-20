@@ -251,6 +251,14 @@ func make(_ component: Component, with controller: Controller) -> some View {
         )
         .modifier(CustomModifiers(modifiers))
         .eraseToAnyView()
+    case .sheetButton(let label, let id, let modifiers):
+        let modifiers = modifiers ?? []
+        return SwiftUI.Button(
+            action: { controller.screenID = id },
+            label: { make(label, with: controller) }
+        )
+        .modifier(CustomModifiers(modifiers))
+        .eraseToAnyView()
     case .horizontal(let alignment, let spacing, let contents):
         return HStack(
             alignment: make(alignment),
@@ -271,6 +279,11 @@ func make(_ component: Component, with controller: Controller) -> some View {
             content: { make(contents, with: controller) }
         )
         .eraseToAnyView()
+    case .spacer(let modifiers):
+        let modifiers = modifiers ?? []
+        return Spacer()
+            .modifier(CustomModifiers(modifiers))
+            .eraseToAnyView()
     case .list(let contents):
         return List {
             make(contents, with: controller)
