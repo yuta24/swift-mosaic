@@ -23,7 +23,7 @@ extension WidgetID: Decodable {
 }
 
 struct Sheet: Decodable {
-    let components: [String: Widget]
+    let widgets: [String: Widget]
 }
 
 struct Widget: Decodable {

@@ -66,11 +66,13 @@ public struct MosaicView: View {
                         item: .init(
                             get: { controller.widgetID },
                             set: { controller.widgetID = $0 }),
-                        content: {
-                            screen.sheet?.components[$0.rawValue]
-                                .flatMap { make($0, with: controller) }?
-                                .eraseToAnyView()
-                            ?? EmptyView().eraseToAnyView()
+                        content: { id in
+                            if let widget = screen.sheet?.widgets[id.rawValue] {
+                                make(widget, with: controller)
+                                    .eraseToAnyView()
+                            } else {
+                                EmptyView().eraseToAnyView()
+                            }
                         }
                     )
                     .eraseToAnyView()
