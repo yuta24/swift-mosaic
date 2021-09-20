@@ -259,24 +259,24 @@ func make(_ component: Component, with controller: Controller) -> some View {
         )
         .modifier(CustomModifiers(modifiers))
         .eraseToAnyView()
-    case .horizontal(let alignment, let spacing, let contents):
+    case .horizontal(let alignment, let spacing, let components):
         return HStack(
             alignment: make(alignment),
             spacing: spacing,
-            content: { make(contents, with: controller) }
+            content: { make(components, with: controller) }
         )
         .eraseToAnyView()
-    case .vertical(let alignment, let spacing, let contents):
+    case .vertical(let alignment, let spacing, let components):
         return VStack(
             alignment: make(alignment),
             spacing: spacing,
-            content: { make(contents, with: controller) }
+            content: { make(components, with: controller) }
         )
         .eraseToAnyView()
-    case .zaxis(let alignment, let contents):
+    case .zaxis(let alignment, let components):
         return ZStack(
             alignment: make(alignment),
-            content: { make(contents, with: controller) }
+            content: { make(components, with: controller) }
         )
         .eraseToAnyView()
     case .spacer(let modifiers):
@@ -284,9 +284,14 @@ func make(_ component: Component, with controller: Controller) -> some View {
         return Spacer()
             .modifier(CustomModifiers(modifiers))
             .eraseToAnyView()
-    case .list(let contents):
+    case .scroll(let components):
+        return SwiftUI.ScrollView {
+            make(components, with: controller)
+        }
+        .eraseToAnyView()
+    case .list(let components):
         return List {
-            make(contents, with: controller)
+            make(components, with: controller)
         }
         .eraseToAnyView()
     case .navigationLink(let link):

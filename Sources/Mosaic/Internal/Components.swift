@@ -97,6 +97,8 @@ enum Component: Decodable {
 
     case spacer(modifiers: [Modifier]?)
 
+    indirect case scroll(components: [Component])
+
     indirect case list(components: [Component])
 
     indirect case navigationLink(link: NavigationLink)
