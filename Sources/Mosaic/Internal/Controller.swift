@@ -4,7 +4,7 @@ class Controller: ObservableObject {
     @Published
     private(set) var provider: Provider
     @Published
-    var screenID: ScreenID?
+    var widgetID: WidgetID?
 
     init(_ provider: Provider) {
         self.provider = provider

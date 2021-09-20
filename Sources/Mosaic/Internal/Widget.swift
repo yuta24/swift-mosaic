@@ -1,21 +1,21 @@
 import Foundation
 import SwiftUI
 
-struct ScreenID: RawRepresentable {
+struct WidgetID: RawRepresentable {
     let rawValue: String
 }
 
-extension ScreenID: Identifiable {
-    var id: ScreenID { self }
+extension WidgetID: Identifiable {
+    var id: WidgetID { self }
 }
 
-extension ScreenID: Hashable {
+extension WidgetID: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(rawValue)
     }
 }
 
-extension ScreenID: Decodable {
+extension WidgetID: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         self.rawValue = try container.decode(String.self)
@@ -23,10 +23,10 @@ extension ScreenID: Decodable {
 }
 
 struct Sheet: Decodable {
-    let components: [String: Component]
+    let components: [String: Widget]
 }
 
-struct Screen: Decodable {
+struct Widget: Decodable {
     enum Content: Decodable {
         case navigation(navigation: Navigation)
         case component(component: Component)

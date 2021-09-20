@@ -254,7 +254,7 @@ func make(_ component: Component, with controller: Controller) -> some View {
     case .sheetButton(let label, let id, let modifiers):
         let modifiers = modifiers ?? []
         return SwiftUI.Button(
-            action: { controller.screenID = id },
+            action: { controller.widgetID = id },
             label: { make(label, with: controller) }
         )
         .modifier(CustomModifiers(modifiers))
@@ -330,8 +330,8 @@ func make(_ navigation: Navigation, with controller: Controller) -> some View {
     }
 }
 
-func make(_ screen: Screen, with controller: Controller) -> some View {
-    switch screen.content {
+func make(_ widget: Widget, with controller: Controller) -> some View {
+    switch widget.content {
     case .navigation(let navigation):
         return make(navigation, with: controller).eraseToAnyView()
     case .component(let component):

@@ -36,12 +36,12 @@ public struct MosaicView: View {
         do {
             let json = try controller.body()
             if let data = json.data(using: .utf8) {
-                let screen = try decoder.decode(Screen.self, from: data)
+                let screen = try decoder.decode(Widget.self, from: data)
                 return make(screen, with: controller)
                     .sheet(
                         item: .init(
-                            get: { controller.screenID },
-                            set: { controller.screenID = $0 }),
+                            get: { controller.widgetID },
+                            set: { controller.widgetID = $0 }),
                         content: {
                             screen.sheet?.components[$0.rawValue]
                                 .flatMap { make($0, with: controller) }?

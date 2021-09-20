@@ -89,7 +89,7 @@ enum Component: Decodable {
     case image(systemName: String, resizable: Bool, modifiers: [Modifier]?)
 
     indirect case button(label: Component, action: ButtonAction?, modifiers: [Modifier]?)
-    indirect case sheetButton(label: Component, id: ScreenID, modifiers: [Modifier]?)
+    indirect case sheetButton(label: Component, id: WidgetID, modifiers: [Modifier]?)
 
     indirect case horizontal(alignment: VerticalAlignment, spacing: CGFloat?, components: [Component])
     indirect case vertical(alignment: HorizontalAlignment, spacing: CGFloat?, components: [Component])
