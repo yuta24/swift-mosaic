@@ -26,7 +26,7 @@ class Controller: ObservableObject {
         }
     }
 
-    func dispatch(_ action: Action) {
+    func dispatch(_ action: ButtonAction) {
         switch action {
         case .local(let command):
             dispatchForLocal(command)

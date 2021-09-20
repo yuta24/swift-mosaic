@@ -36,8 +36,8 @@ public struct MosaicView: View {
         do {
             let json = try controller.body()
             if let data = json.data(using: .utf8) {
-                return try decoder.decode(Screen.self, from: data)
-                    .toView(with: controller)
+                let screen = try decoder.decode(Screen.self, from: data)
+                return make(screen, with: controller)
                     .eraseToAnyView()
             } else {
                 return EmptyView()
