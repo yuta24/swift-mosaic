@@ -3,6 +3,7 @@ import SwiftUI
 
 public enum Provider {
     case json(String)
+    case file(URL)
 }
 
 private let decoder: JSONDecoder = {

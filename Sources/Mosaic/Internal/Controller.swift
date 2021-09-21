@@ -27,6 +27,13 @@ class Controller: ObservableObject {
             } else {
                 state = .failed(NSError() as Error)
             }
+        case .file(let url):
+            do {
+                let data = try Data(contentsOf: url)
+                state = .data(data)
+            } catch {
+                state = .failed(error)
+            }
         }
     }
 
