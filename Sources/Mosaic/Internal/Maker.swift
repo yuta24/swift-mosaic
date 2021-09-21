@@ -232,6 +232,11 @@ func make(_ component: UIComponent, with controller: Controller) -> some View {
         return SwiftUI.Text(title)
             .modifier(CustomModifiers(modifiers))
             .eraseToAnyView()
+    case .edit(let key, let title, let modifiers):
+        let modifiers = modifiers ?? []
+        return TextFieldWrapper(title, key)
+            .modifier(CustomModifiers(modifiers))
+            .eraseToAnyView()
     case .image(let systemName, let resizable, let modifiers):
         let modifiers = modifiers ?? []
         if resizable {
@@ -254,10 +259,15 @@ func make(_ component: UIComponent, with controller: Controller) -> some View {
         }
         .modifier(CustomModifiers(modifiers))
         .eraseToAnyView()
-    case .button(let label, let action, let modifiers):
+    case .scoped(let value, let component):
+        return Scoped(value) {
+            make(component, with: controller)
+        }
+        .eraseToAnyView()
+    case .submitButton(let label, let command, let modifiers):
         let modifiers = modifiers ?? []
-        return SwiftUI.Button(
-            action: { if let action = action { controller.dispatch(action) } },
+        return SubmitButton(
+            action: { if let command = command { controller.dispatch(command, $0) } },
             label: { make(label, with: controller) }
         )
         .modifier(CustomModifiers(modifiers))
@@ -270,25 +280,31 @@ func make(_ component: UIComponent, with controller: Controller) -> some View {
         )
         .modifier(CustomModifiers(modifiers))
         .eraseToAnyView()
-    case .horizontal(let alignment, let spacing, let components):
+    case .horizontal(let alignment, let spacing, let components, let modifiers):
+        let modifiers = modifiers ?? []
         return HStack(
             alignment: make(alignment),
             spacing: spacing,
             content: { make(components, with: controller) }
         )
+        .modifier(CustomModifiers(modifiers))
         .eraseToAnyView()
-    case .vertical(let alignment, let spacing, let components):
+    case .vertical(let alignment, let spacing, let components, let modifiers):
+        let modifiers = modifiers ?? []
         return VStack(
             alignment: make(alignment),
             spacing: spacing,
             content: { make(components, with: controller) }
         )
+        .modifier(CustomModifiers(modifiers))
         .eraseToAnyView()
-    case .zaxis(let alignment, let components):
+    case .zaxis(let alignment, let components, let modifiers):
+        let modifiers = modifiers ?? []
         return ZStack(
             alignment: make(alignment),
             content: { make(components, with: controller) }
         )
+        .modifier(CustomModifiers(modifiers))
         .eraseToAnyView()
     case .spacer(let modifiers):
         let modifiers = modifiers ?? []

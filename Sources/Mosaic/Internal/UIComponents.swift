@@ -66,11 +66,6 @@ struct AsyncImage: Decodable {
     let url: URL
 }
 
-enum ButtonAction: Decodable {
-    case local(String)
-    case remote
-}
-
 struct NavigationLink: Decodable {
     enum Destination: Decodable {
         case json(component: UIComponent)
@@ -80,17 +75,26 @@ struct NavigationLink: Decodable {
     let label: UIComponent
 }
 
+enum ButtonCommand: Decodable {
+    case save(collection: String)
+    case update(document: String, collection: String)
+    case delete(document: String, collection: String)
+}
+
 enum UIComponent: Decodable {
     case text(title: String, modifiers: [Modifier]?)
+    case edit(key: String, title: String, modifiers: [Modifier]?)
     case image(systemName: String, resizable: Bool, modifiers: [Modifier]?)
     case asyncImage(url: URL, resizable: Bool, modifiers: [Modifier]?)
 
-    indirect case button(label: UIComponent, action: ButtonAction?, modifiers: [Modifier]?)
+    indirect case scoped(value: [String: String], component: UIComponent)
+
+    indirect case submitButton(label: UIComponent, command: ButtonCommand?, modifiers: [Modifier]?)
     indirect case sheetButton(label: UIComponent, id: WidgetID, modifiers: [Modifier]?)
 
-    indirect case horizontal(alignment: VerticalAlignment, spacing: CGFloat?, components: [UIComponent])
-    indirect case vertical(alignment: HorizontalAlignment, spacing: CGFloat?, components: [UIComponent])
-    indirect case zaxis(alignment: Alignment, components: [UIComponent])
+    indirect case horizontal(alignment: VerticalAlignment, spacing: CGFloat?, components: [UIComponent], modifiers: [Modifier]?)
+    indirect case vertical(alignment: HorizontalAlignment, spacing: CGFloat?, components: [UIComponent], modifiers: [Modifier]?)
+    indirect case zaxis(alignment: Alignment, components: [UIComponent], modifiers: [Modifier]?)
 
     case spacer(modifiers: [Modifier]?)
 

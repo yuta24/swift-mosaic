@@ -12,7 +12,7 @@ private let decoder: JSONDecoder = {
     return decoder
 }()
 
-public struct MosaicView: View {
+public struct Mosaic: View {
     @StateObject
     private var controller: Controller
 
@@ -27,8 +27,8 @@ public struct MosaicView: View {
         }
     }
 
-    public init(_ provider: Provider) {
-        self._controller = .init(wrappedValue: .init(provider))
+    public init(_ provider: Provider, handler: @escaping (Command) -> Void) {
+        self._controller = .init(wrappedValue: .init(provider, handler: handler))
     }
 
     private func makeLoadingView() -> some View {
@@ -47,6 +47,7 @@ public struct MosaicView: View {
                     content: { id in
                         if let widget = screen.sheet?.widgets[id.rawValue] {
                             make(widget, with: controller)
+                                .environmentObject(controller)
                                 .eraseToAnyView()
                         } else {
                             EmptyView().eraseToAnyView()
@@ -55,7 +56,7 @@ public struct MosaicView: View {
                 )
                 .eraseToAnyView()
         } catch {
-            print(error)
+            print(#file, #line, error)
             return SwiftUI.Text("The JSON parsing failed.")
                 .eraseToAnyView()
         }

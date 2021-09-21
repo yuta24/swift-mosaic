@@ -22,10 +22,6 @@ extension WidgetID: Decodable {
     }
 }
 
-struct Sheet: Decodable {
-    let widgets: [String: Widget]
-}
-
 struct Widget: Decodable {
     enum Content: Decodable {
         case navigation(navigation: Navigation)
