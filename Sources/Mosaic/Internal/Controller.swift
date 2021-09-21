@@ -24,7 +24,7 @@ class Controller: ObservableObject {
         self.handler = handler
     }
 
-    func load() {
+    func load() async {
         switch provider {
         case .json(let json):
             if let data = json.data(using: .utf8) {
@@ -38,6 +38,30 @@ class Controller: ObservableObject {
                 state = .data(data)
             } catch {
                 state = .failed(error)
+            }
+        case .request(let request):
+            var request = request
+
+            do {
+                if let token = try await Engine.provider() {
+                    request.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                }
+
+                URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+                    DispatchQueue.main.async { [weak self] in
+                        if let error = error {
+                            self?.state = .failed(error)
+                            return
+                        }
+
+                        if let data = data {
+                            self?.state = .data(data)
+                        }
+                    }
+                }
+                .resume()
+            } catch {
+                print(#file, #line, error)
             }
         }
     }

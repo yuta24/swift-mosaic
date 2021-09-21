@@ -4,6 +4,7 @@ import SwiftUI
 public enum Provider {
     case json(String)
     case file(URL)
+    case request(URLRequest)
 }
 
 private let decoder: JSONDecoder = {
@@ -33,8 +34,8 @@ public struct Mosaic: View {
 
     private func makeLoadingView() -> some View {
         return ProgressView()
-            .onAppear {
-                controller.load()
+            .task {
+                await controller.load()
             }
     }
 
