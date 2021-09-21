@@ -1,49 +1,8 @@
 import Foundation
 import SwiftUI
 
-public protocol Sourceable {
-    func toString() -> String
-}
-
-extension Int: Sourceable {
-    public func toString() -> String {
-        return "\(self)"
-    }
-}
-
-extension UInt: Sourceable {
-    public func toString() -> String {
-        return "\(self)"
-    }
-}
-
-extension Float: Sourceable {
-    public func toString() -> String {
-        return "\(self)"
-    }
-}
-
-extension Double: Sourceable {
-    public func toString() -> String {
-        return "\(self)"
-    }
-}
-
-extension CGFloat: Sourceable {
-    public func toString() -> String {
-        return "\(self)"
-    }
-}
-
-extension String: Sourceable {
-    public func toString() -> String {
-        return self
-    }
-}
-
 public enum Provider {
-    case json(String, [String: Sourceable], (String, inout [String: Sourceable]) -> Void)
-    case file(URL, [String: Sourceable], (String, inout [String: Sourceable]) -> Void)
+    case json(String)
 }
 
 private let decoder: JSONDecoder = {
@@ -57,29 +16,43 @@ public struct MosaicView: View {
     private var controller: Controller
 
     public var body: some View {
-        do {
-            let json = try controller.body()
-            if let data = json.data(using: .utf8) {
-                let screen = try decoder.decode(Widget.self, from: data)
-                return make(screen, with: controller)
-                    .sheet(
-                        item: .init(
-                            get: { controller.widgetID },
-                            set: { controller.widgetID = $0 }),
-                        content: { id in
-                            if let widget = screen.sheet?.widgets[id.rawValue] {
-                                make(widget, with: controller)
-                                    .eraseToAnyView()
-                            } else {
-                                EmptyView().eraseToAnyView()
-                            }
-                        }
-                    )
-                    .eraseToAnyView()
-            } else {
-                return EmptyView()
-                    .eraseToAnyView()
+        switch controller.state {
+        case .loading:
+            return makeLoadingView().eraseToAnyView()
+        case .data(let data):
+            return makeDataView(data).eraseToAnyView()
+        case .failed(let error):
+            return makeFailedView(error).eraseToAnyView()
+        }
+    }
+
+    public init(_ provider: Provider) {
+        self._controller = .init(wrappedValue: .init(provider))
+    }
+
+    private func makeLoadingView() -> some View {
+        return ProgressView()
+            .onAppear {
+                controller.load()
             }
+    }
+
+    private func makeDataView(_ data: Data) -> some View {
+        do {
+            let screen = try decoder.decode(Widget.self, from: data)
+            return make(screen, with: controller)
+                .sheet(
+                    item: controller.binding(\.widgetID),
+                    content: { id in
+                        if let widget = screen.sheet?.widgets[id.rawValue] {
+                            make(widget, with: controller)
+                                .eraseToAnyView()
+                        } else {
+                            EmptyView().eraseToAnyView()
+                        }
+                    }
+                )
+                .eraseToAnyView()
         } catch {
             print(error)
             return SwiftUI.Text("The JSON parsing failed.")
@@ -87,7 +60,7 @@ public struct MosaicView: View {
         }
     }
 
-    public init(_ provider: Provider) {
-        self._controller = .init(wrappedValue: .init(provider))
+    private func makeFailedView(_ error: Error) -> some View {
+        return EmptyView()
     }
 }
