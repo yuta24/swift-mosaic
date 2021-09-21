@@ -133,7 +133,7 @@ func make(_ mode: ContentMode) -> SwiftUI.ContentMode {
     }
 }
 
-func make(_ components: [Component], with controller: Controller) -> some View {
+func make(_ components: [UIComponent], with controller: Controller) -> some View {
     switch components.count {
     case 0:
         return EmptyView()
@@ -225,7 +225,7 @@ func make(_ components: [Component], with controller: Controller) -> some View {
     }
 }
 
-func make(_ component: Component, with controller: Controller) -> some View {
+func make(_ component: UIComponent, with controller: Controller) -> some View {
     switch component {
     case .text(let title, let modifiers):
         let modifiers = modifiers ?? []

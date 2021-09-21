@@ -29,7 +29,7 @@ struct Sheet: Decodable {
 struct Widget: Decodable {
     enum Content: Decodable {
         case navigation(navigation: Navigation)
-        case component(component: Component)
+        case component(component: UIComponent)
     }
 
     let content: Content

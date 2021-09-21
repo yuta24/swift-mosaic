@@ -71,36 +71,32 @@ enum ButtonAction: Decodable {
     case remote
 }
 
-struct ToolbarItem: Decodable {
-    let content: Component
-}
-
 struct NavigationLink: Decodable {
     enum Destination: Decodable {
-        case json(component: Component)
+        case json(component: UIComponent)
     }
 
     let destination: Destination
-    let label: Component
+    let label: UIComponent
 }
 
-enum Component: Decodable {
+enum UIComponent: Decodable {
     case text(title: String, modifiers: [Modifier]?)
     case image(systemName: String, resizable: Bool, modifiers: [Modifier]?)
     case asyncImage(url: URL, resizable: Bool, modifiers: [Modifier]?)
 
-    indirect case button(label: Component, action: ButtonAction?, modifiers: [Modifier]?)
-    indirect case sheetButton(label: Component, id: WidgetID, modifiers: [Modifier]?)
+    indirect case button(label: UIComponent, action: ButtonAction?, modifiers: [Modifier]?)
+    indirect case sheetButton(label: UIComponent, id: WidgetID, modifiers: [Modifier]?)
 
-    indirect case horizontal(alignment: VerticalAlignment, spacing: CGFloat?, components: [Component])
-    indirect case vertical(alignment: HorizontalAlignment, spacing: CGFloat?, components: [Component])
-    indirect case zaxis(alignment: Alignment, components: [Component])
+    indirect case horizontal(alignment: VerticalAlignment, spacing: CGFloat?, components: [UIComponent])
+    indirect case vertical(alignment: HorizontalAlignment, spacing: CGFloat?, components: [UIComponent])
+    indirect case zaxis(alignment: Alignment, components: [UIComponent])
 
     case spacer(modifiers: [Modifier]?)
 
-    indirect case scroll(components: [Component])
+    indirect case scroll(components: [UIComponent])
 
-    indirect case list(components: [Component])
+    indirect case list(components: [UIComponent])
 
     indirect case navigationLink(link: NavigationLink)
 }
