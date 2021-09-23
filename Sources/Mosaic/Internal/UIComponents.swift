@@ -69,6 +69,7 @@ struct AsyncImage: Decodable {
 struct NavigationLink: Decodable {
     enum Destination: Decodable {
         case json(component: UIComponent)
+        case ref(url: URL)
     }
 
     let destination: Destination
@@ -100,7 +101,7 @@ enum UIComponent: Decodable {
 
     indirect case scroll(components: [UIComponent])
 
-    indirect case list(components: [UIComponent])
+    indirect case list(refreshable: Bool, components: [UIComponent])
 
     indirect case navigationLink(link: NavigationLink)
 }

@@ -8,6 +8,8 @@ class Controller: ObservableObject {
         case failed(Error)
     }
 
+    let handler: (Command) -> Void
+
     @Published
     var widgetID: WidgetID?
 
@@ -17,7 +19,6 @@ class Controller: ObservableObject {
     @Published
     private(set) var provider: Provider
 
-    private let handler: (Command) -> Void
 
     init(_ provider: Provider, handler: @escaping (Command) -> Void) {
         self.provider = provider

@@ -316,16 +316,32 @@ func make(_ component: UIComponent, with controller: Controller) -> some View {
             make(components, with: controller)
         }
         .eraseToAnyView()
-    case .list(let components):
-        return List {
+    case .list(let refreshable, let components):
+        var target = List {
             make(components, with: controller)
         }
         .eraseToAnyView()
+
+        if refreshable {
+            target = target.refreshable {
+                // FIXME: enable animation
+                await controller.load()
+            }
+            .eraseToAnyView()
+        }
+
+        return target
     case .navigationLink(let link):
         switch link.destination {
         case .json(let destination):
             return SwiftUI.NavigationLink(
                 destination: { Lazy(make(destination, with: controller)) },
+                label: { make(link.label, with: controller) }
+            )
+            .eraseToAnyView()
+        case .ref(let url):
+            return SwiftUI.NavigationLink(
+                destination: { Lazy(Mosaic(.request(.init(url: url)), handler: controller.handler)) },
                 label: { make(link.label, with: controller) }
             )
             .eraseToAnyView()
